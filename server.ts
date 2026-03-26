@@ -27,11 +27,11 @@ app.post('/api/render', async (req, res) => {
       return res.status(400).json({ error: 'code is required' });
     }
 
-    const fps = 24; // 24 FPS saves 20% rendering time compared to 30 FPS
-    const durationInFrames = durationInSeconds ? Math.floor(durationInSeconds * fps) : 120;
-    // Compress resolution to 720p to guarantee it finishes within 100 seconds timeout limit
-    const width = ratio === "16:9" ? 1280 : 720;
-    const height = ratio === "16:9" ? 720 : 1280;
+    const fps = 30; // Restore original FPS to prevent animation desync
+    const durationInFrames = durationInSeconds ? Math.floor(durationInSeconds * fps) : 150;
+    // Restore original Full HD resolution since JPEG compression avoids the timeout
+    const width = ratio === "16:9" ? 1920 : 1080;
+    const height = ratio === "16:9" ? 1080 : 1920;
     const compositionId = "DynamicComp";
 
     // 1. Generate Job ID
@@ -71,8 +71,8 @@ app.post('/api/render', async (req, res) => {
       concurrency: 1, // Only render one frame at a time to prevent Out Of Memory on Render.com free plan
       inputProps: { code },
       browserExecutable: process.env.PUPPETEER_EXECUTABLE_PATH,
-      imageFormat: 'jpeg', // JPEG is far less memory intensive than PNG
-      jpegQuality: 80
+      imageFormat: 'jpeg', // Keep JPEG to prevent 100s timeout limit (much faster than PNG)
+      jpegQuality: 90 // High quality
     });
 
     console.log(`Render complete for job: ${jobId}`);
