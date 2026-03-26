@@ -26,6 +26,11 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# Compile TypeScript and Build Remotion Bundle beforehand!
+# This uses the 8GB RAM build server instead of the 512MB RAM live server.
+RUN npx tsc
+RUN npx ts-node build.ts
+
 EXPOSE 8080
 
-CMD ["npm", "start"]
+CMD ["node", "dist/server.js"]

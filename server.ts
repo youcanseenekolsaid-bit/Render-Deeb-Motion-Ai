@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { bundle } from '@remotion/bundler';
 import { getCompositions, renderMedia } from '@remotion/renderer';
 import { createClient } from '@supabase/supabase-js';
 import path from 'path';
@@ -17,19 +16,8 @@ app.use(express.json());
 // Setup Supabase (Not needed if we send the file directly, but kept for reference)
 let supabase: ReturnType<typeof createClient> | null = null;
 
-let bundledContent: string | null = null;
-
-// Bundle Remotion project (this bundles your React code)
-const getBundle = async () => {
-  if (!bundledContent) {
-    console.log('Building Remotion bundle...');
-    bundledContent = await bundle({
-      entryPoint: path.resolve('./remotion/index.ts'),
-    });
-    console.log('Bundle built!');
-  }
-  return bundledContent;
-};
+// Bundling is now handled strictly in the Docker build phase!
+// so we don't crash the 512MB RAM live server.
 
 app.post('/api/render', async (req, res) => {
   try {
@@ -51,8 +39,8 @@ app.post('/api/render', async (req, res) => {
     // 2. Instead of generating a job locally, we will wait for the render
     // and then stream the file directly to the client.
     
-    // 3. Render Video
-    const serveUrl = await getBundle();
+    // 3. Render Video using pre-built bundle
+    const serveUrl = path.resolve('./bundle');
     const comps = await getCompositions(serveUrl, { inputProps: { code } });
     const composition = comps.find((c) => c.id === compositionId);
 
@@ -76,8 +64,11 @@ app.post('/api/render', async (req, res) => {
       serveUrl,
       codec: 'h264',
       outputLocation,
+      concurrency: 1, // Only render one frame at a time to prevent Out Of Memory on Render.com free plan
       inputProps: { code },
-      // chromiumOptions: { executablePath: process.env.PUPPETEER_EXECUTABLE_PATH } // Added automatically by Docker
+      chromiumOptions: { 
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--single-process'] 
+      }
     });
 
     console.log(`Render complete for job: ${jobId}`);
