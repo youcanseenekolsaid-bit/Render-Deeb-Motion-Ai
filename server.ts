@@ -41,7 +41,10 @@ app.post('/api/render', async (req, res) => {
     
     // 3. Render Video using pre-built bundle
     const serveUrl = path.resolve('./bundle');
-    const comps = await getCompositions(serveUrl, { inputProps: { code } });
+    const comps = await getCompositions(serveUrl, { 
+      inputProps: { code },
+      browserExecutable: process.env.PUPPETEER_EXECUTABLE_PATH
+    });
     const composition = comps.find((c) => c.id === compositionId);
 
     if (!composition) {

@@ -35,7 +35,10 @@ app.post('/api/render', async (req, res) => {
         // and then stream the file directly to the client.
         // 3. Render Video using pre-built bundle
         const serveUrl = path_1.default.resolve('./bundle');
-        const comps = await (0, renderer_1.getCompositions)(serveUrl, { inputProps: { code } });
+        const comps = await (0, renderer_1.getCompositions)(serveUrl, {
+            inputProps: { code },
+            browserExecutable: process.env.PUPPETEER_EXECUTABLE_PATH
+        });
         const composition = comps.find((c) => c.id === compositionId);
         if (!composition) {
             return res.status(404).json({ error: `Composition ${compositionId} not found` });
