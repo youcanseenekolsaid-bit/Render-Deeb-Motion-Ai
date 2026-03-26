@@ -66,9 +66,6 @@ app.post('/api/render', async (req, res) => {
       outputLocation,
       concurrency: 1, // Only render one frame at a time to prevent Out Of Memory on Render.com free plan
       inputProps: { code },
-      chromiumOptions: { 
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--single-process'] 
-      }
     });
 
     console.log(`Render complete for job: ${jobId}`);
