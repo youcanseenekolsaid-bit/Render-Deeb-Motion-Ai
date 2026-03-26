@@ -56,6 +56,7 @@ app.post('/api/render', async (req, res) => {
             outputLocation,
             concurrency: 1, // Only render one frame at a time to prevent Out Of Memory on Render.com free plan
             inputProps: { code },
+            browserExecutable: process.env.PUPPETEER_EXECUTABLE_PATH
         });
         console.log(`Render complete for job: ${jobId}`);
         // 4. Send the file directly to the user's browser
