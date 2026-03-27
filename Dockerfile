@@ -33,4 +33,6 @@ RUN npx ts-node build.ts
 
 EXPOSE 8080
 
-CMD ["node", "dist/server.js"]
+# Restrict Node to 200MB RAM to ensure FFmpeg and Chromium have the remaining 300MB
+# on the 512MB free tier constraint!
+CMD ["node", "--max-old-space-size=200", "dist/server.js"]

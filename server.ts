@@ -72,7 +72,8 @@ app.post('/api/render', async (req, res) => {
       inputProps: { code },
       browserExecutable: process.env.PUPPETEER_EXECUTABLE_PATH,
       imageFormat: 'jpeg', // Keep JPEG to prevent 100s timeout limit (much faster than PNG)
-      jpegQuality: 90 // High quality
+      jpegQuality: 90, // High quality
+      crf: 26 // Reduce FFmpeg memory peak and export file size, standard for web video
     });
 
     console.log(`Render complete for job: ${jobId}`);
