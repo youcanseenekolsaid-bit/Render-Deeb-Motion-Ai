@@ -73,7 +73,8 @@ app.post('/api/render', async (req, res) => {
       browserExecutable: process.env.PUPPETEER_EXECUTABLE_PATH,
       imageFormat: 'jpeg', // Keep JPEG to prevent 100s timeout limit (much faster than PNG)
       jpegQuality: 90, // High quality
-      crf: 26 // Reduce FFmpeg memory peak and export file size, standard for web video
+      crf: 26, // Reduce FFmpeg memory peak and export file size, standard for web video
+      scale: 0.5 // Draw the 1080p canvas safely but physically shrink it 50% (540p) to guarantee no FFmpeg Memory Crashes on 512MB RAM!
     });
 
     console.log(`Render complete for job: ${jobId}`);
